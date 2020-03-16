@@ -1,2 +1,2 @@
-# zerobase_firebase_functions
+# Zerobase Firebase Functions
 Firebase functions for supporting Zerobase app
