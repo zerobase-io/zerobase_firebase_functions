@@ -27,8 +27,8 @@ STATUS: 201
   "messageType":"GET_TESTED",
   "locale":"en-US",
   "contactDetails": {
-    "deviceFp":"ABC123"
-    "phoneNumber":"555-123-4567"
+    "deviceFp":"ABC123",
+    "phoneNumber":"555-123-4567",
     "email":"test@zerobase.io"
   },
   "messageResults": {
@@ -53,8 +53,8 @@ STATUS: 500
   "messageType":"GET_TESTED",
   "locale":"en-US",
   "contactDetails": {
-    "deviceFp":"ABC123"
-    "phoneNumber":"555-123-4567"
+    "deviceFp":"ABC123",
+    "phoneNumber":"555-123-4567",
     "email":"test@zerobase.io"
   },
   "messageResults": {
@@ -67,7 +67,7 @@ STATUS: 500
     "email": {
       "didSucceed":false,
       "error": {
-        Undefined as of 13:56 CDT 3/18/20
+        //Undefined as of 13:56 CDT 3/18/20
       }
     }
   }
