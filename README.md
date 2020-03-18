@@ -11,8 +11,8 @@ Example Body:
 {
   "messageType":"GET_TESTED",
   "contactDetails": {
-    "deviceFp":"ABC123"
-    "phoneNumber":"555-123-4567"
+    "deviceFp":"ABC123",
+    "phoneNumber":"555-123-4567",
     "email":"test@zerobase.io"
   }
 }
