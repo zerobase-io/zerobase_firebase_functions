@@ -16,7 +16,7 @@ main.use(cors());
 // TODO [ndrwksr | 3/16/20]: See https://github.com/zerobase-io/zerobase_firebase_functions/issues/3
 //  - This is the wrong place to put this, but the question "where should I put this" isn't
 //    one I can answer. If you know better how to structure this, please feel free to fix it.
-main.post('/messages', async (req, res) => {
+main.post('/messaging', async (req, res) => {
     // TODO [ndrwksr | 3/18/20]: See https://github.com/zerobase-io/zerobase_firebase_functions/pull/9
     //  - Impl according to updated README.md from above pull request
 });

@@ -10,6 +10,7 @@ Example Body:
 ```json
 {
   "messageType":"GET_TESTED",
+  "locale":"en-US",
   "contactDetails": {
     "deviceFp":"ABC123",
     "phoneNumber":"555-123-4567",
@@ -22,8 +23,9 @@ Example Success Response:
 ```json
 STATUS: 201
 {
-  "_id":"asdfghjklzxcvbnm"
+  "_id":"asdfghjklzxcvbnm",
   "messageType":"GET_TESTED",
+  "locale":"en-US",
   "contactDetails": {
     "deviceFp":"ABC123"
     "phoneNumber":"555-123-4567"
@@ -31,13 +33,13 @@ STATUS: 201
   },
   "messageResults": {
     "deviceFp": {
-      "didSucceed":true,
-    }
+      "didSucceed":true
+    },
     "phoneNumber": {
-      "didSucceed":true,
-    }
+      "didSucceed":true
+    },
     "email": {
-      "didSucceed":true,
+      "didSucceed":true
     }
   }
 }
@@ -47,8 +49,9 @@ Example Failure Response:
 ```json
 STATUS: 500
 {
-  "_id":"asdfghjklzxcvbnm"
+  "_id":"asdfghjklzxcvbnm",
   "messageType":"GET_TESTED",
+  "locale":"en-US",
   "contactDetails": {
     "deviceFp":"ABC123"
     "phoneNumber":"555-123-4567"
@@ -56,11 +59,11 @@ STATUS: 500
   },
   "messageResults": {
     "deviceFp": {
-      "didSucceed":true,
-    }
+      "didSucceed":true
+    },
     "phoneNumber": {
-      "didSucceed":true,
-    }
+      "didSucceed":true
+    },
     "email": {
       "didSucceed":false,
       "error": {
