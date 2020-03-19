@@ -1,6 +1,18 @@
 # Zerobase Firebase Functions
 This repo contains the Firebase Functions required to operate the Zerobase app. 
 
+The system takes a message request (detailed in endpoint doc) and sends a message using each of the provided contact details.
+
+Get added to the Firebase project and download firebase tools with `npm i -g firebase-tools`
+
+Login with `firebase login`
+
+You can start the system for testing with `firebase serve` and deploy with `firebase deploy`.
+
+https://firebase.google.com/docs/functions/get-started
+
+https://firebase.google.com/docs/functions/http-events
+
 ## Endpoints
 ### /messaging
 #### `POST`
