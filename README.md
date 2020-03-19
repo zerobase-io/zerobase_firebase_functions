@@ -42,6 +42,7 @@ Example Body:
 ```json
 {
   "messageType":"GET_TESTED",
+  "locale":"en-US",
   "contactDetails": {
     "deviceFp":"ABC123",
     "phoneNumber":"555-123-4567",
@@ -54,22 +55,23 @@ Example Success Response:
 ```json
 STATUS: 201
 {
-  "_id":"asdfghjklzxcvbnm"
+  "_id":"asdfghjklzxcvbnm",
   "messageType":"GET_TESTED",
+  "locale":"en-US",
   "contactDetails": {
-    "deviceFp":"ABC123"
-    "phoneNumber":"555-123-4567"
+    "deviceFp":"ABC123",
+    "phoneNumber":"555-123-4567",
     "email":"test@zerobase.io"
   },
   "messageResults": {
     "deviceFp": {
-      "didSucceed":true,
-    }
+      "didSucceed":true
+    },
     "phoneNumber": {
-      "didSucceed":true,
-    }
+      "didSucceed":true
+    },
     "email": {
-      "didSucceed":true,
+      "didSucceed":true
     }
   }
 }
@@ -79,24 +81,25 @@ Example Failure Response:
 ```json
 STATUS: 500
 {
-  "_id":"asdfghjklzxcvbnm"
+  "_id":"asdfghjklzxcvbnm",
   "messageType":"GET_TESTED",
+  "locale":"en-US",
   "contactDetails": {
-    "deviceFp":"ABC123"
-    "phoneNumber":"555-123-4567"
+    "deviceFp":"ABC123",
+    "phoneNumber":"555-123-4567",
     "email":"test@zerobase.io"
   },
   "messageResults": {
     "deviceFp": {
-      "didSucceed":true,
-    }
+      "didSucceed":true
+    },
     "phoneNumber": {
-      "didSucceed":true,
-    }
+      "didSucceed":true
+    },
     "email": {
       "didSucceed":false,
       "error": {
-        Undefined as of 13:56 CDT 3/18/20
+        //Undefined as of 13:56 CDT 3/18/20
       }
     }
   }
