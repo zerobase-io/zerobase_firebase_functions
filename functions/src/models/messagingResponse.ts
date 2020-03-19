@@ -1,6 +1,5 @@
 import {MessagingRequest} from "./messagingRequest";
 import {MessageType} from "./messageType";
-import {MessagingMedium} from "./messagingMedium";
 import {MessagingOutcome} from "./messagingOutcome";
 
 /**
@@ -9,12 +8,12 @@ import {MessagingOutcome} from "./messagingOutcome";
  */
 export class MessagingResponse extends MessagingRequest {
     constructor(
-        public _id: String | undefined,
         messageType: MessageType,
         locale: string,
-        contactDetails: Map<MessagingMedium, string>,
-        public messageResults: Map<MessagingMedium, MessagingOutcome>
+        contactDetails: { [key:string]: string; },
+        public messageResults: { [key:string]: MessagingOutcome; }
     ) {
         super(messageType, locale, contactDetails);
+        this.messageResults = messageResults;
     }
 }

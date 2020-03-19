@@ -1,5 +1,4 @@
 import {getMessageType, MessageType} from "./messageType";
-import {MessagingMedium} from "./messagingMedium";
 
 const Joi = require('@hapi/joi');
 
@@ -24,7 +23,7 @@ export class MessagingRequest {
     constructor(
         public messageType: MessageType,
         public locale: string,
-        public contactDetails: Map<MessagingMedium, string>
+        public contactDetails: { [key:string]: string; }
     ) {
     }
 

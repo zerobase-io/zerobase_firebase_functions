@@ -13,7 +13,7 @@ import {
 
 export function acceptNewMessageRequest(fcm: admin.messaging.Messaging): (message: MessagingRequest) => Promise<MessagingResponse> {
     return function (message: MessagingRequest): Promise<MessagingResponse> {
-        const deviceFp = message.contactDetails.get(MessagingMedium.DEVICE_FP);
+        const deviceFp = message.contactDetails[MessagingMedium.DEVICE_FP];
         let pnPromise: Promise<MessagingOutcome> | undefined = undefined;
         if (deviceFp) {
             pnPromise = sendToTopic(
@@ -24,8 +24,7 @@ export function acceptNewMessageRequest(fcm: admin.messaging.Messaging): (messag
             )
         }
 
-
-        const emailAddress = message.contactDetails.get(MessagingMedium.EMAIL);
+        const emailAddress = message.contactDetails[MessagingMedium.EMAIL];
         let emailPromise: Promise<MessagingOutcome> | undefined = undefined;
         if (emailAddress) {
             emailPromise = sendEmail(
@@ -35,7 +34,7 @@ export function acceptNewMessageRequest(fcm: admin.messaging.Messaging): (messag
             )
         }
 
-        const phoneNumber = message.contactDetails.get(MessagingMedium.PHONE_NUMBER);
+        const phoneNumber = message.contactDetails[MessagingMedium.PHONE_NUMBER];
         let smsPromise: Promise<MessagingOutcome> | undefined = undefined;
         if (phoneNumber) {
             smsPromise = sendSms(
@@ -49,34 +48,33 @@ export function acceptNewMessageRequest(fcm: admin.messaging.Messaging): (messag
             let emailOutcome = values[1];
             let smsOutcome = values[2];
 
-            let messagingOutcomes = new Map<MessagingMedium, MessagingOutcome>();
+            let messagingOutcomes: { [key:string]: MessagingOutcome; } = {};
             if (pnOutcome) {
                 console.log("Attempted push notification:", pnOutcome);
-                messagingOutcomes.set(MessagingMedium.DEVICE_FP, pnOutcome)
+                messagingOutcomes[MessagingMedium.DEVICE_FP] = pnOutcome;
             }
 
             if (emailOutcome) {
                 console.log("Attempted email:", emailOutcome);
-                messagingOutcomes.set(MessagingMedium.DEVICE_FP, emailOutcome)
+                messagingOutcomes[MessagingMedium.EMAIL] = emailOutcome;
             }
 
             if (smsOutcome) {
                 console.log("Attempted SMS:", smsOutcome);
-                messagingOutcomes.set(MessagingMedium.DEVICE_FP, smsOutcome)
+                messagingOutcomes[MessagingMedium.PHONE_NUMBER] = smsOutcome;
             }
 
+            console.log("messaging outcomes:", messagingOutcomes);
+
             let response = new MessagingResponse(
-                undefined,
                 message.messageType,
                 message.locale,
                 message.contactDetails,
                 messagingOutcomes
             );
 
-            return admin.firestore().collection("/messaging").add(response).then(ref => {
-                response._id = ref.id;
-                return response;
-            })
+            console.log("response", response);
+            return response;
         })
     }
 }
