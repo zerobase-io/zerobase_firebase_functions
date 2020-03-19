@@ -1,17 +1,37 @@
-# Zerobase Firebase Functions
-This repo contains the Firebase Functions required to operate the Zerobase app. 
+# Zerobase Notification System
+This repo contains the Firebase Functions required to operate the Zerobase notification system. 
 
-The system takes a message request (detailed in endpoint doc) and sends a message using each of the provided contact details.
+When the tracing system identifies users who need to be instructed to take actions (shelter in place, get tested, etc.) it will invoke
+functionality offered by the Firebase Functions in this repo to do so. To send messages to users, the tracing system will make a POST to
+the /messaging endpoint with a MessagingRequest object (models/MessagingRequest.ts) with the contact details required to contact the 
+user through the appropriate mediums. The tracing system can send between [1, n] contact details where n is the number of supported 
+mediums (currently 3 for push notifications, SMS and email).
 
-Get added to the Firebase project and download firebase tools with `npm i -g firebase-tools`
+The messaging system will then send the appropriate messages (in parallel) and wait for all messaging functions to halt, at which point
+it will colate the results and return them in a MessagingResponse object. If any of the mediums failed the status code of the response
+will be 500, otherwise it will be 201 (CREATED because we created a new object in our Firestore /messaging collection and are now
+returning that object to the user). Details of the outcomes of each messaging attempt can be found in the response object. The other two 
+expected error statuses are 422 for a bad request object, and 404 if the client attempts to send a push notification to a device that
+doesn't have the app installed.
 
-Login with `firebase login`
+## Getting Started
+First, reach out to John Lo for access to the Firebase project. You don't need this permission to test/hack on this system, but you 
+will need it to deploy your changes. Not everyone needs this access, but deploying is currently the best way to test changes so it's
+highly recommended for the time being.
 
-You can start the system for testing with `firebase serve` and deploy with `firebase deploy`.
+Google provides a very ergonomic set of tools for devloping/deploying Firebase Functions and (assuming you have `npm` installed)
+you can install it with the following command: `npm i -g firebase-tools`.
 
-https://firebase.google.com/docs/functions/get-started
+If you were added to the Firebase project, use `firebase login` to log into your Google account and gain the ability to deploy.
 
-https://firebase.google.com/docs/functions/http-events
+Time to get hacking! Here's some good resources/commands:
+
+* You can start the system for testing with `firebase serve`, and deploy with `firebase deploy`.
+
+* Google's ["Get Started" guide](https://firebase.google.com/docs/functions/get-started) for Firebase functions (more specific 
+intructions for what I've laid out here)
+
+* Google's [guide to HTTP-event functions](https://firebase.google.com/docs/functions/http-events)
 
 ## Endpoints
 ### /messaging
