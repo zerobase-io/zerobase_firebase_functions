@@ -16,7 +16,7 @@ jobs:
       - name: Yarn Add TSLint
         run: yarn global add tslint typescript
       - name: Build
-        run: npm --prefix \"$RESOURCE_DIR\" run build
+        run: npm --prefix "functions" run build
       - name: Archive Production Artifact
         uses: actions/upload-artifact@master
         with:
