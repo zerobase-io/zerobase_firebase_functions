@@ -5,7 +5,8 @@
 export class MessagingOutcome {
     constructor(
         public didSucceed: boolean,
-        public error: any
+        public error: any,
+        public data: any
     ) {
     }
 }

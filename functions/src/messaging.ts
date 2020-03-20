@@ -1,4 +1,5 @@
 import * as admin from "firebase-admin";
+import * as functions from 'firebase-functions';
 import {MessagingRequest} from "./models/messagingRequest";
 import {MessagingMedium} from "./models/messagingMedium";
 import {MessagingResponse} from "./models/messagingResponse"
@@ -10,12 +11,15 @@ import {
     getPnTitleForLocale,
     getSmsMessageForLocale
 } from "./i18n/messageProvider";
+import {MessageType} from "./models/messageType";
+import {Twilio} from "twilio";
 
 /**
  * Returns a function that processes MessagingRequests and sends the messages outline in the request.
  * @param fcm The messaging provider to use to send push notifications.
+ * @param twilio The TwilioClient to be used to send SMS messages.
  */
-export function acceptNewMessageRequest(fcm: admin.messaging.Messaging): (message: MessagingRequest) => Promise<MessagingResponse> {
+export function acceptNewMessageRequest(fcm: admin.messaging.Messaging, twilio: Twilio): (message: MessagingRequest) => Promise<MessagingResponse> {
     /**
      * Returns a Promise<MessagingResponse> with the results of the system's attempts to honour the MessagingRequest.
      * @param message The MessagingRequest containing required contact details and type of message to be sent.
@@ -32,6 +36,7 @@ export function acceptNewMessageRequest(fcm: admin.messaging.Messaging): (messag
                 getPnTitleForLocale(message.messageType, message.locale),
                 getPnBodyForLocale(message.messageType, message.locale),
                 deviceFp,
+                message.messageType,
                 fcm
             )
         }
@@ -44,7 +49,7 @@ export function acceptNewMessageRequest(fcm: admin.messaging.Messaging): (messag
                 getEmailSubjectForLocale(message.messageType, message.locale),
                 getEmailBodyForLocale(message.messageType, message.locale),
                 emailAddress
-            ).catch(e => new MessagingOutcome(false, e))
+            ).catch(e => new MessagingOutcome(false, e, undefined))
         }
 
         // Send SMS
@@ -53,8 +58,9 @@ export function acceptNewMessageRequest(fcm: admin.messaging.Messaging): (messag
         if (phoneNumber) {
             smsPromise = sendSms(
                 getSmsMessageForLocale(message.messageType, message.locale),
-                phoneNumber
-            ).catch(e => new MessagingOutcome(false, e))
+                phoneNumber,
+                twilio
+            ).catch(e => new MessagingOutcome(false, e, undefined))
         }
 
         // Wait for all to complete, collate outcomes and return
@@ -101,12 +107,14 @@ export function acceptNewMessageRequest(fcm: admin.messaging.Messaging): (messag
  * @param topic The topic on which to send the message. This will usually be the location FP
  *              for the location of exposure, but could also be something like "general" to
  *              send a message to all users of the app.
+ * @param type The type of the message being sent.
  * @param fcm The Messaging instance to send the messages with.
  */
 function sendToTopic(
     title: string,
     body: string,
     topic: string,
+    type: MessageType,
     fcm: admin.messaging.Messaging
 ): Promise<MessagingOutcome> {
     console.log("sendToTopic", title, body, topic);
@@ -127,9 +135,9 @@ function sendToTopic(
 
     return new Promise(resolve => {
         fcm.sendToTopic(topic, payload).then(messagingResponse => {
-            resolve(new MessagingOutcome(true, undefined))
+            resolve(new MessagingOutcome(true, undefined, undefined))
         }).catch(e => {
-            resolve(new MessagingOutcome(false, e))
+            resolve(new MessagingOutcome(false, e, undefined))
         })
     });
 }
@@ -147,19 +155,27 @@ function sendEmail(
 ): Promise<MessagingOutcome> {
     console.log("sendEmail:", subject, body, emailAddress);
     // TODO [ndrwksr | 3/19/20] https://github.com/zerobase-io/zerobase_firebase_functions/issues/12
-    return Promise.resolve(new MessagingOutcome(true, undefined))
+    return Promise.resolve(new MessagingOutcome(true, undefined, undefined))
 }
 
 /**
  * Sends an SMS message with the provided text to the provided phone number.
  * @param text The text to send in the SMS message.
  * @param phoneNumber The phone number to which the SMS message will be sent.
+ * @param twilio The Twilio client to send SMS messages with.
  */
 function sendSms(
     text: string,
-    phoneNumber: string
+    phoneNumber: string,
+    twilio: Twilio
 ): Promise<MessagingOutcome> {
     console.log("sendSms:", text, phoneNumber);
     // TODO [ndrwksr | 3/19/20] https://github.com/zerobase-io/zerobase_firebase_functions/issues/13
-    return Promise.resolve(new MessagingOutcome(true, undefined))
+    return twilio.messages
+        .create({
+            body: 'This is the ship that made the Kessel Run in fourteen parsecs?',
+            from: functions.config()["twilio"]["phoneno"],
+            to: phoneNumber
+        })
+        .then(message => new MessagingOutcome(true, undefined, message));
 }
