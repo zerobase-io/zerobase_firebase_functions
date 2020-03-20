@@ -38,6 +38,8 @@ intructions for what I've laid out here)
 #### `POST`
 Creates a new document in the `/messages` collection and sends the message. Does not respond until message has been sent so that success/failure can be communicated back. A new document is made regardless or success or failure. All three contact details fields are optional, but at least one option must be present (or else what's the point?). A failure in any of the messaging attempts (push notification, email, text) will cause the response status to be 500, even if only one messaging attempt failed. The information to determine the exact failure mode is included in the response body.
 
+See examples for phone number format.
+
 Example Body:
 ```json
 {
@@ -45,7 +47,7 @@ Example Body:
   "locale":"en-US",
   "contactDetails": {
     "deviceFp":"ABC123",
-    "phoneNumber":"555-123-4567",
+    "phoneNumber":"+15551234567",
     "email":"test@zerobase.io"
   }
 }
@@ -60,7 +62,7 @@ STATUS: 201
   "locale":"en-US",
   "contactDetails": {
     "deviceFp":"ABC123",
-    "phoneNumber":"555-123-4567",
+    "phoneNumber":"+15551234567",
     "email":"test@zerobase.io"
   },
   "messageResults": {
@@ -86,7 +88,7 @@ STATUS: 500
   "locale":"en-US",
   "contactDetails": {
     "deviceFp":"ABC123",
-    "phoneNumber":"555-123-4567",
+    "phoneNumber":"+15551234567",
     "email":"test@zerobase.io"
   },
   "messageResults": {
@@ -113,3 +115,16 @@ Expected Errors:
 ## Functions
 ### `webApi`
 This function hooks in Express, see Endpoints for further details.
+
+
+## Config
+#### Twilio
+##### sid
+The SID for our Twilio account.
+
+##### token
+The API token for our Twilio account.
+
+##### phoneno
+The phone number which Twilio will use to send texts.
+
