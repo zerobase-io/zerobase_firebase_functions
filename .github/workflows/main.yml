@@ -36,6 +36,10 @@ jobs:
         with:
           name: lib
           path: functions/lib
+      - name: Install Dependencies
+        run: npm --prefix "functions" install
+      - name: Yarn Add TSLint
+        run: yarn global add tslint typescript
       - name: Deploy to Firebase
         uses: w9jds/firebase-action@master
         with:
