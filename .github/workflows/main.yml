@@ -11,6 +11,8 @@ jobs:
     steps:
       - name: Checkout Repo
         uses: actions/checkout@master
+      - name: Yarn Add TSLint
+        run: yarn add tslint typescript
       - name: Deploy to Firebase
         uses: w9jds/firebase-action@master
         with:
