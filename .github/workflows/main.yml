@@ -15,13 +15,15 @@ jobs:
         run: npm --prefix "functions" install
       - name: Yarn Add TSLint
         run: yarn global add tslint typescript
+      - name: Lint
+        run: npm --prefix "functions" run lint
       - name: Build
         run: npm --prefix "functions" run build
       - name: Archive Production Artifact
         uses: actions/upload-artifact@master
         with:
           name: lib
-          path: .
+          path: functions
   deploy:
     name: Deploy
     needs: build
