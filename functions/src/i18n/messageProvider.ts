@@ -1,6 +1,6 @@
 import {MessageType} from "../models/messageType";
 
-export function getPnTitleForLocale(messageType: MessageType, locale: string) {
+export function getPnTitleForLocale(messageType: MessageType, locale: string): string {
     // TODO [ndrwksr | 3/18/20]: Impl (for real)
     switch (messageType) {
         case MessageType.GET_TESTED:
@@ -10,7 +10,7 @@ export function getPnTitleForLocale(messageType: MessageType, locale: string) {
     }
 }
 
-export function getPnBodyForLocale(messageType: MessageType, locale: string) {
+export function getPnBodyForLocale(messageType: MessageType, locale: string): string {
     // TODO [ndrwksr | 3/18/20]: Impl (for real)
     switch (messageType) {
         case MessageType.GET_TESTED:
@@ -22,17 +22,31 @@ export function getPnBodyForLocale(messageType: MessageType, locale: string) {
     }
 }
 
-export function getEmailSubjectForLocale(messageType: MessageType, locale: string) {
-    // TODO [ndrwksr | 3/18/20]: Impl
-    return "email subject"
+export function getEmailSubjectForLocale(messageType: MessageType, locale: string): string {
+    // TODO [ndrwksr | 3/18/20]: Impl (for real)
+    switch (messageType) {
+        case MessageType.GET_TESTED:
+            return "New SARS-COV-2 Exposure; Time To Get Tested.";
+        case MessageType.SELF_ISOLATE:
+            return "New SARS-COV-2 Exposure; Time To Self-Isolate";
+    }
 }
 
-export function getEmailBodyForLocale(messageType: MessageType, locale: string) {
-    // TODO [ndrwksr | 3/18/20]: Impl
-    return "email body"
+export function getEmailBodyForLocale(messageType: MessageType, locale: string): string {
+    // TODO [ndrwksr | 3/18/20]: Impl (for real)
+    switch (messageType) {
+        case MessageType.GET_TESTED:
+            return "Don't panic! We're here to help get you tested ASAP.";
+        case MessageType.SELF_ISOLATE:
+            return "Don't panic! Social distancing is our most powerful tool."
+    }
 }
 
 export function getSmsMessageForLocale(messageType: MessageType, locale: string) {
-    // TODO [ndrwksr | 3/18/20]: Impl
-    return "SMS message"
+    switch (messageType) {
+        case MessageType.GET_TESTED:
+            return "New SARS-COV-2 Exposure; Time To Get Tested.";
+        case MessageType.SELF_ISOLATE:
+            return "New SARS-COV-2 Exposure; Time To Self-Isolate";
+    }
 }

@@ -11,17 +11,19 @@ export class MessagingRequest {
      * Schema for Joi validation.
      */
     static schema = Joi.object({
-        // TODO [ndrwksr | 3/18/20]: No GH issue yet, feel free to make one.
+        // TODO [ndrwksr | 3/21/20]: No GH issue yet, feel free to make one.
     });
 
     /**
      * Builds a new Exposure from a document snapshot.
      * @param messageType The type of message to be sent. See MessageType.
+     * @param token The API token for the notification system.
      * @param locale The locale for messages.
      * @param contactDetails A map between the messaging mediums in use and their appropriate contact info.
      */
     constructor(
         public messageType: MessageType,
+        public token: string | undefined,
         public locale: string,
         public contactDetails: { [key:string]: string; }
     ) {
@@ -34,6 +36,7 @@ export class MessagingRequest {
     static fromReqBody(body: any) {
         return new MessagingRequest(
             getMessageType(body.messageType),
+            body.token,
             body.locale,
             body.contactDetails
         )

@@ -13,13 +13,19 @@ import {
 } from "./i18n/messageProvider";
 import {MessageType} from "./models/messageType";
 import {Twilio} from "twilio";
+import * as crypto from "crypto";
 
 /**
  * Returns a function that processes MessagingRequests and sends the messages outline in the request.
  * @param fcm The messaging provider to use to send push notifications.
- * @param twilio The TwilioClient to be used to send SMS messages.
+ * @param twilio The Twilio client to be used to send SMS messages.
+ * @param mailgun The Mailgun client to be used to send emails.
  */
-export function acceptNewMessageRequest(fcm: admin.messaging.Messaging, twilio: Twilio): (message: MessagingRequest) => Promise<MessagingResponse> {
+export function acceptNewMessageRequest(
+    fcm: admin.messaging.Messaging,
+    twilio: Twilio,
+    mailgun: any
+): (message: MessagingRequest) => Promise<MessagingResponse> {
     /**
      * Returns a Promise<MessagingResponse> with the results of the system's attempts to honour the MessagingRequest.
      * @param message The MessagingRequest containing required contact details and type of message to be sent.
@@ -48,7 +54,8 @@ export function acceptNewMessageRequest(fcm: admin.messaging.Messaging, twilio: 
             emailPromise = sendEmail(
                 getEmailSubjectForLocale(message.messageType, message.locale),
                 getEmailBodyForLocale(message.messageType, message.locale),
-                emailAddress
+                emailAddress,
+                mailgun
             ).catch(e => new MessagingOutcome(false, e, undefined))
         }
 
@@ -64,12 +71,12 @@ export function acceptNewMessageRequest(fcm: admin.messaging.Messaging, twilio: 
         }
 
         // Wait for all to complete, collate outcomes and return
-        return Promise.all([pnPromise, smsPromise, emailPromise]).then(values => {
-            let pnOutcome = values[0];
-            let emailOutcome = values[1];
-            let smsOutcome = values[2];
+        return Promise.all([pnPromise, emailPromise, smsPromise]).then(values => {
+            const pnOutcome = values[0];
+            const emailOutcome = values[1];
+            const smsOutcome = values[2];
 
-            let messagingOutcomes: { [key:string]: MessagingOutcome; } = {};
+            const messagingOutcomes: { [key: string]: MessagingOutcome; } = {};
             if (pnOutcome) {
                 console.log("Attempted push notification:", pnOutcome);
                 messagingOutcomes[MessagingMedium.DEVICE_FP] = pnOutcome;
@@ -87,7 +94,7 @@ export function acceptNewMessageRequest(fcm: admin.messaging.Messaging, twilio: 
 
             console.log("messaging outcomes:", messagingOutcomes);
 
-            let response = new MessagingResponse(
+            const response = new MessagingResponse(
                 message.messageType,
                 message.locale,
                 message.contactDetails,
@@ -123,19 +130,19 @@ function sendToTopic(
             title: title,
             body: body,
             icon: 'https://zerobase.io/dist/img/zerobase_medium_logo.png',
-            click_action: 'FLUTTER_NOTIFICATION_CLICK' // required only for onResume or onLaunch callbacks
         },
-        // TODO [ndrwksr | 3/16/20]: See https://github.com/zerobase-io/zerobase_firebase_functions/issues/2
-        //  - Implement adding payloads so that the app can determine
-        //    how to appropriately react to the message.
-        // data: {
-        //
-        // }
+        data: {
+            // This doesn't have to be secure, this is just a UID so that when the app receives the same message several
+            // times (bug in FCM Flutter plugin), we can throw out the repeat messages.
+            id: crypto.randomBytes(20).toString('hex'),
+            messageType: type,
+            click_action: 'FLUTTER_NOTIFICATION_CLICK', // required only for onResume or onLaunch callbacks
+        }
     };
 
     return new Promise(resolve => {
         fcm.sendToTopic(topic, payload).then(messagingResponse => {
-            resolve(new MessagingOutcome(true, undefined, undefined))
+            resolve(new MessagingOutcome(true, undefined, messagingResponse))
         }).catch(e => {
             resolve(new MessagingOutcome(false, e, undefined))
         })
@@ -147,15 +154,30 @@ function sendToTopic(
  * @param subject The subject of the email.
  * @param body The body of the email.
  * @param emailAddress The address to which the email will be sent.
+ * @param mailgun The Mailgun client to send emails with.
  */
 function sendEmail(
     subject: string,
     body: string,
-    emailAddress: string
+    emailAddress: string,
+    mailgun: any
 ): Promise<MessagingOutcome> {
     console.log("sendEmail:", subject, body, emailAddress);
-    // TODO [ndrwksr | 3/19/20] https://github.com/zerobase-io/zerobase_firebase_functions/issues/12
-    return Promise.resolve(new MessagingOutcome(true, undefined, undefined))
+
+    return new Promise((resolve, reject) => {
+        mailgun.sendMail({
+            from: mailgun.__from,
+            to: emailAddress,
+            subject: subject,
+            text: body
+        }, (err: Error, info: any) => {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(info);
+            }
+        })
+    }).then((result: any) => new MessagingOutcome(true, undefined, result));
 }
 
 /**
@@ -173,7 +195,7 @@ function sendSms(
     // TODO [ndrwksr | 3/19/20] https://github.com/zerobase-io/zerobase_firebase_functions/issues/13
     return twilio.messages
         .create({
-            body: 'This is the ship that made the Kessel Run in fourteen parsecs?',
+            body: text,
             from: functions.config()["twilio"]["phoneno"],
             to: phoneNumber
         })
