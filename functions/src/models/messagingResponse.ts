@@ -10,10 +10,11 @@ export class MessagingResponse extends MessagingRequest {
     constructor(
         messageType: MessageType,
         locale: string,
-        contactDetails: { [key:string]: string; },
-        public messageResults: { [key:string]: MessagingOutcome; }
+        contactDetails: { [key: string]: string; },
+        data: any,
+        public messageResults: { [key: string]: MessagingOutcome; }
     ) {
-        super(messageType, locale, contactDetails);
+        super(messageType, undefined, locale, contactDetails, data);
         this.messageResults = messageResults;
     }
 }

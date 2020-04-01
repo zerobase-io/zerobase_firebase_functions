@@ -20,12 +20,14 @@ export class MessagingRequest {
      * @param token The API token for the notification system.
      * @param locale The locale for messages.
      * @param contactDetails A map between the messaging mediums in use and their appropriate contact info.
+     * @param data Extra parameters for special message types.
      */
     constructor(
         public messageType: MessageType,
         public token: string | undefined,
         public locale: string,
-        public contactDetails: { [key:string]: string; }
+        public contactDetails: { [key:string]: string },
+        public data: any
     ) {
     }
 
@@ -38,7 +40,8 @@ export class MessagingRequest {
             getMessageType(body.messageType),
             body.token,
             body.locale,
-            body.contactDetails
+            body.contactDetails,
+            body.data
         )
     }
 }

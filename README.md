@@ -57,8 +57,13 @@ Example Body:
   	"deviceFp":"aaaabbbbccccddddeeeeffff",
   	"phoneNumber":"+15551234567",
   	"email":"info@zerobase.io"
+  },
+  "data":{
+    
   }
 }
+
+// data object is not required unless the message type requires additional data. 
 ```
 
 Example Success Response:
@@ -121,8 +126,50 @@ Example Failure Response (Happy Path):
 }
 ```
 
-```json
+### Message Types
+#### GET_TESTED
+##### Description
+Instructs the user to visit the CDC's site for instructions on how to get tested.
 
+##### Data
+None.
+
+#### SELF_ISOLATE
+##### Description
+Instructs the user to visit the CDC's site for instructions on how to self-isolate.
+
+##### Data
+None.
+
+#### PLEASE_CALL
+##### Description
+Instructions the user to call a specific number. The push notifications don't have the number, but when they are opened
+the will open up a popup dialog that has a button that automatically dials the number for the user.
+
+##### Data
+```json
+"data": {
+  "phoneNumber":"+15551234567" 
+}
+
+// phoneNumber is required.
+```
+
+#### CUSTOM
+##### Description
+Fires off a message with the text specified in `data`. All fields in `data` are required!
+
+##### Data
+```json
+"data": {
+  "pnTitle":"Custom PN Title", 
+  "pnBody":"Custom PN Body",
+  "emailSubject":"Custom Email Subject",
+  "emailBody":"Custom Email Body",
+  "sms":"Custom SMS Message"
+}
+
+// All fields required.
 ```
 
 ## Firebase Functions Configuration

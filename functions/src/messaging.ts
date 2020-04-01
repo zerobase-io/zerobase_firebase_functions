@@ -39,10 +39,11 @@ export function acceptNewMessageRequest(
         let pnPromise: Promise<MessagingOutcome> | undefined = undefined;
         if (deviceFp) {
             pnPromise = sendToTopic(
-                getPnTitleForLocale(message.messageType, message.locale),
-                getPnBodyForLocale(message.messageType, message.locale),
+                getPnTitleForLocale(message.messageType, message.locale, message.data),
+                getPnBodyForLocale(message.messageType, message.locale, message.data),
                 deviceFp,
                 message.messageType,
+                message.data,
                 fcm
             )
         }
@@ -52,8 +53,8 @@ export function acceptNewMessageRequest(
         let emailPromise: Promise<MessagingOutcome> | undefined = undefined;
         if (emailAddress) {
             emailPromise = sendEmail(
-                getEmailSubjectForLocale(message.messageType, message.locale),
-                getEmailBodyForLocale(message.messageType, message.locale),
+                getEmailSubjectForLocale(message.messageType, message.locale, message.data),
+                getEmailBodyForLocale(message.messageType, message.locale, message.data),
                 emailAddress,
                 mailgun
             ).catch(e => new MessagingOutcome(false, e, undefined))
@@ -64,7 +65,7 @@ export function acceptNewMessageRequest(
         let smsPromise: Promise<MessagingOutcome> | undefined = undefined;
         if (phoneNumber) {
             smsPromise = sendSms(
-                getSmsMessageForLocale(message.messageType, message.locale),
+                getSmsMessageForLocale(message.messageType, message.locale, message.data),
                 phoneNumber,
                 twilio
             ).catch(e => new MessagingOutcome(false, e, undefined))
@@ -98,6 +99,7 @@ export function acceptNewMessageRequest(
                 message.messageType,
                 message.locale,
                 message.contactDetails,
+                message.data,
                 messagingOutcomes
             );
 
@@ -115,6 +117,7 @@ export function acceptNewMessageRequest(
  *              for the location of exposure, but could also be something like "general" to
  *              send a message to all users of the app.
  * @param type The type of the message being sent.
+ * @param data Extra parameters for special message types.
  * @param fcm The Messaging instance to send the messages with.
  */
 function sendToTopic(
@@ -122,6 +125,7 @@ function sendToTopic(
     body: string,
     topic: string,
     type: MessageType,
+    data: any,
     fcm: admin.messaging.Messaging
 ): Promise<MessagingOutcome> {
     console.log("sendToTopic", title, body, topic);
@@ -136,6 +140,7 @@ function sendToTopic(
             // times (bug in FCM Flutter plugin), we can throw out the repeat messages.
             id: crypto.randomBytes(20).toString('hex'),
             messageType: type,
+            phoneNumber: data.phoneNumber,
             click_action: 'FLUTTER_NOTIFICATION_CLICK', // required only for onResume or onLaunch callbacks
         }
     };
