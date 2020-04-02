@@ -63,7 +63,8 @@ Example Body:
   }
 }
 
-// data object is not required unless the message type requires additional data. 
+// DATA IS REQUIRED, EVEN IF EMPTY!!
+// This is a bug we can squash later.
 ```
 
 Example Success Response:
